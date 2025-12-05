@@ -77,5 +77,3 @@ int main()
   delete[] cnv;
   return err;
 }
-
-
