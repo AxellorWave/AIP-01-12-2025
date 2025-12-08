@@ -37,6 +37,15 @@ namespace top {
     int len;
   };
 
+  struct Dline: IDraw {
+    Dline(int x, int y, int l);
+    Dline(p_t p, int l);
+    p_t begin() const override;
+    p_t next(p_t p) const override;
+    p_t start;
+    int len;
+  };
+
   struct Square: IDraw {
     Square(int x, int y, int l);
     Square(p_t p, int l);
@@ -44,6 +53,15 @@ namespace top {
     p_t next(p_t p) const override;
     p_t start;
     int len;
+  };
+
+  struct Rectangle: IDraw {
+    Rectangle(int x, int y, int a, int b);
+    Rectangle(p_t p, int a, int b);
+    p_t begin() const override;
+    p_t next(p_t p) const override;
+    p_t start;
+    int a_, b_;
   };
 
   struct frame_t {
@@ -71,13 +89,13 @@ namespace top {
 int main()
 {
   int err = 0;
-  top::IDraw * f[3] = {};
+  top::IDraw * f[6] = {};
   top::p_t * p = nullptr;
   char * cnv = nullptr;
   size_t s = 0; 
   try {
-    make_f(f,3);
-    for (size_t i = 0; i < 3; ++i) {
+    make_f(f,6);
+    for (size_t i = 0; i < 6; ++i) {
       get_points(f[i], &p, s);
     }
     top::frame_t fr = top::build_frame(p, s);
@@ -90,6 +108,9 @@ int main()
   delete f[0];
   delete f[1];
   delete f[2];
+  delete f[3];
+  delete f[4];
+  delete f[5];
   delete[] p;
   delete[] cnv;
   return err;
@@ -179,13 +200,44 @@ top::p_t top::Hline::next(p_t p) const
   return {p.x + 1, p.y};
 }
 
+top::Dline::Dline(int x, int y, int l):
+  IDraw(),
+  start{x, y},
+  len(l)
+{
+  if (len == 0) {
+    throw std::invalid_argument("lenght can not be 0");
+  }
+  if (len < 0) {
+    len *= -1;
+    start.y -= len;
+  }
+}
+
+top::Dline::Dline(p_t p, int l):
+  Dline(p.x, p.y, l)
+{}
+
+top::p_t top::Dline::begin() const
+{
+  return start;
+}
+
+top::p_t top::Dline::next(p_t p) const
+{
+  if (p.y == start.y + len - 1) {
+    return start;
+  }
+  return {p.x + 1, p.y + 1};
+}
+
 top::Square::Square(int x, int y, int l):
   IDraw(),
   start{x, y},
   len(l)
 {
   if (len <= 0) {
-    throw std::invalid_argument("lenght can not be  <= 0");
+    throw std::invalid_argument("lenght can not be <= 0");
   }
 }
 
@@ -215,11 +267,52 @@ top::p_t top::Square::next(p_t p) const
   return start;
 }
 
+top::Rectangle::Rectangle(int x, int y, int a, int b):
+  IDraw(),
+  start{x, y},
+  a_(a),
+  b_(b)
+{
+  if (a_ <= 0 || b_ <= 0) {
+    throw std::invalid_argument("lenght can not be <= 0");
+  }
+}
+
+top::Rectangle::Rectangle(p_t p, int a, int b):
+  Rectangle(p.x, p.y, a, b)
+{}
+
+top::p_t top::Rectangle::begin() const
+{
+  return start;
+}
+
+top::p_t top::Rectangle::next(p_t p) const
+{
+  if (p.x == start.x && p.y < start.y + a_ - 1) {
+    return {p.x, p.y + 1};
+  }
+  if (p.y == start.y + a_ - 1 && p.x < start.x + b_ - 1) {
+    return {p.x + 1, p.y};
+  }
+  if (p.x == start.x + b_ - 1 && p.y > start.y) {
+    return {p.x, p.y - 1};
+  }
+  if (p.y == start.y && p.x > start.x) {
+    return {p.x - 1, p.y};
+  }
+  return start;
+}
+
 void top::make_f(IDraw ** b, size_t k)
 {
   b[0] = new Dot(0, 0);
   b[1] = new Hline({-1, -5}, 5);
-  b[2] = new Square(7, 7, 3);
+  b[2] = new Square(15, 7, 5);
+  b[3] = new Dline(0, 3, 4);
+  b[4] = new Vline(11, 8, 7);
+  b[5] = new Rectangle(20, 16, 3, 7);
+
 }
 
 void top::extend(p_t ** pts, size_t s, p_t p)
