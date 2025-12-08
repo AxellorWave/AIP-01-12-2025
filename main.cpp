@@ -86,14 +86,15 @@ namespace top {
 
 int main()
 {
+  size_t size = 6;
   int err = 0;
-  top::IDraw * f[6] = {};
+  top::IDraw * f[size] = {};
   top::p_t * p = nullptr;
   char * cnv = nullptr;
   size_t s = 0; 
   try {
-    make_f(f,6);
-    for (size_t i = 0; i < 6; ++i) {
+    make_f(f,size);
+    for (size_t i = 0; i < size; ++i) {
       get_points(f[i], &p, s);
     }
     top::frame_t fr = top::build_frame(p, s);
@@ -103,12 +104,9 @@ int main()
   } catch (...) {
     err = 1;
   }
-  delete f[0];
-  delete f[1];
-  delete f[2];
-  delete f[3];
-  delete f[4];
-  delete f[5];
+  for (size_t i = 0; i < size; ++i) {
+    delete f[i];
+  }
   delete[] p;
   delete[] cnv;
   return err;
