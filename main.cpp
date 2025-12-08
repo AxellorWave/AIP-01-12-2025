@@ -53,9 +53,9 @@ namespace top {
   void make_f(IDraw ** b, size_t k);
   size_t get_points(IDraw * b, p_t ** ps, size_t & s);
   frame_t build_frame(const p_t * ps, size_t s);
-  char * build_canvas(frame_t f);
+  char * build_canvas(frame_t f, char fill);
   void paint_canvas(char * cnv, frame_t fr, const p_t * ps, size_t k, char f);
-  void print_canvas(const char * cnv, frame_t fr);
+  void print_canvas(std::ostream & os, const char * cnv, frame_t fr);
   void extend(p_t ** pts, size_t s, p_t p);
   bool operator==(p_t a, p_t b)
   {
@@ -81,9 +81,9 @@ int main()
       get_points(f[i], &p, s);
     }
     top::frame_t fr = top::build_frame(p, s);
-    cnv = top::build_canvas(fr);
+    cnv = top::build_canvas(fr, '.');
     top::paint_canvas(cnv, fr, p, s, '&');
-    top::print_canvas(cnv, fr);
+    top::print_canvas(std::cout, cnv, fr);
   } catch (...) {
     err = 1;
   }
@@ -131,10 +131,9 @@ top::Vline::Vline(int x, int y, int l):
   }
 }
 
-top::Vline::Vline(p_t p, int l)
-{
-  Vline(p.x, p.y, l);
-}
+top::Vline::Vline(p_t p, int l):
+  Vline(p.x, p.y, l)
+{}
 
 top::p_t top::Vline::begin() const
 {
@@ -163,10 +162,9 @@ top::Hline::Hline(int x, int y, int l):
   }
 }
 
-top::Hline::Hline(p_t p, int l)
-{
-  Hline(p.x, p.y, l);
-}
+top::Hline::Hline(p_t p, int l):
+  Hline(p.x, p.y, l)
+{}
 
 top::p_t top::Hline::begin() const
 {
@@ -191,10 +189,9 @@ top::Square::Square(int x, int y, int l):
   }
 }
 
-top::Square::Square(p_t p, int l)
-{
-  Square(p.x, p.y, l);
-}
+top::Square::Square(p_t p, int l):
+  Square(p.x, p.y, l)
+{}
 
 top::p_t top::Square::begin() const
 {
@@ -215,13 +212,14 @@ top::p_t top::Square::next(p_t p) const
   if (p.y == start.y && p.x > start.x) {
     return {p.x - 1, p.y};
   }
+  return start;
 }
 
 void top::make_f(IDraw ** b, size_t k)
 {
   b[0] = new Dot(0, 0);
-  b[1] = new Dot(-1, -5);
-  b[2] = new Dot(7, 7);
+  b[1] = new Hline({-1, -5}, 5);
+  b[2] = new Square(7, 7, 3);
 }
 
 void top::extend(p_t ** pts, size_t s, p_t p)
@@ -245,7 +243,7 @@ size_t top::get_points(IDraw * b, p_t ** ps, size_t & s)
     extend(ps, s + delta, p);
     ++delta;
   }
-  return delta;
+  return s+=delta;
 }
 
 top::frame_t top::build_frame(const p_t * ps, size_t s)
@@ -266,17 +264,41 @@ top::frame_t top::build_frame(const p_t * ps, size_t s)
   return {aa, bb};
 }
 
-char * top::build_canvas(frame_t f)
+size_t rows(top::frame_t fr) 
 {
-  // Посчитать кол-во колонок и строк (max - min + 1)
+  return (fr.rightTop.y - fr.leftBot.y + 1);
+}
+
+size_t cols(top::frame_t fr) 
+{
+  return (fr.rightTop.x - fr.leftBot.x + 1);
+}
+
+char * top::build_canvas(frame_t f, char fill)
+{
+  char * cnv =  new char[rows(f) * cols(f)];
+  for (size_t i = 0; i < rows(f) * cols(f); ++i) {
+    cnv[i] = fill; 
+  }
+  return cnv;
 }
 
 void top::paint_canvas(char * cnv, frame_t fr, const p_t * ps, size_t k, char f)
 {
-  // Перевести в другие координаты
+  for (size_t i = 0; i < k; ++i) {
+    int dx = ps[i].x - fr.leftBot.x;
+    int dy = fr.rightTop.y - ps[i].y;
+    cnv[dy * cols(fr) + dx] = f;
+  }
+  
 }
 
-void top::print_canvas(const char * cnv, frame_t fr)
+void top::print_canvas(std::ostream & os, const char * cnv, frame_t fr)
 {
-  // std::cout
+  for (size_t i = 0; i < rows(fr); ++i) {
+    for (size_t j = 0; j < cols(fr); ++j) {
+      os << cnv[i * cols(fr) + j];
+    }
+    os << "\n";
+  }
 }
