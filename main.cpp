@@ -11,11 +11,29 @@ namespace top {
   };
 
   struct Dot: IDraw {
-    p_t o;
     Dot(int x, int y);
     Dot(p_t p);
     p_t begin() const override;
     p_t next(p_t p) const override;
+    p_t o;
+  };
+
+  struct Vline: IDraw {
+    Vline(int x, int y, int l);
+    Vline(p_t p, int l);
+    p_t begin() const override;
+    p_t next(p_t p) const override;
+    p_t start;
+    int len;
+  };
+
+  struct Hline: IDraw {
+    Hline(int x, int y, int l);
+    Hline(p_t p, int l);
+    p_t begin() const override;
+    p_t next(p_t p) const override;
+    p_t start;
+    int len;
   };
 
   struct frame_t {
@@ -67,7 +85,8 @@ int main()
 }
 
 top::Dot::Dot(int x, int y):
-  IDraw(), o{x,y}
+  IDraw(), 
+  o{x,y}
 {}
 top::p_t top::Dot::begin() const
 {
@@ -80,11 +99,13 @@ top::p_t top::Dot::next(p_t p) const
 }
 
 top::Dot::Dot(int x, int y):
-  IDraw(), o{x, y}
+  IDraw(),
+  o{x, y}
 {}
 
 top::Dot::Dot(p_t p):
-  IDraw(), o{p.x, p.y}
+  IDraw(), 
+  o(p)
 {}
 
 top::p_t top::Dot::begin() const
@@ -95,6 +116,70 @@ top::p_t top::Dot::begin() const
 top::p_t top::Dot::next(p_t p) const
 {
   return begin();
+}
+
+top::Vline::Vline(int x, int y, int l):
+  IDraw(),
+  start{x, y},
+  len(l)
+{
+  if (len == 0) {
+    throw std::invalid_argument("lenght can not be 0");
+  }
+  if (len < 0) {
+    len *= -1;
+    start.y -= len;
+  }
+}
+
+top::Vline::Vline(p_t p, int l)
+{
+  Vline(p.x, p.y, l);
+}
+
+top::p_t top::Vline::begin() const
+{
+  return start;
+}
+
+top::p_t top::Vline::next(p_t p) const
+{
+  if (p.y == start.y + len - 1) {
+    return start;
+  }
+  return {p.x, p.y + 1};
+}
+
+top::Hline::Hline(int x, int y, int l):
+  IDraw(),
+  start{x, y},
+  len(l)
+{
+  if (len == 0) {
+    throw std::invalid_argument("lenght can not be 0");
+  }
+  if (len < 0) {
+    len *= -1;
+    start.x -= len;
+  }
+}
+
+top::Hline::Hline(p_t p, int l)
+{
+  Hline(p.x, p.y, l);
+}
+
+top::p_t top::Hline::begin() const
+{
+  return start;
+}
+
+top::p_t top::Hline::next(p_t p) const
+{
+  if (p.x == start.x + len - 1) {
+    return start;
+  }
+  return {p.x + 1, p.y};
 }
 
 void top::make_f(IDraw ** b, size_t k)
