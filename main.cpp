@@ -55,11 +55,23 @@ namespace top {
     int a_, b_;
   };
 
+  struct RectangleFilled: IDraw {
+    RectangleFilled(int x, int y, int a, int b);
+    RectangleFilled(p_t p, int a, int b);
+    p_t begin() const override;
+    p_t next(p_t p) const override;
+    p_t start;
+    int a_, b_;
+  };
+
   struct Square: Rectangle {
-    Square(int x, int y, int l):
-      Rectangle(x, y, l, l)
-    {}
+    Square(int x, int y, int l);
     Square(p_t p, int l);
+  };
+
+  struct SquareFilled: RectangleFilled {
+    SquareFilled(int x, int y, int l);
+    SquareFilled(p_t p, int l);
   };
 
   struct frame_t {
@@ -86,7 +98,7 @@ namespace top {
 
 int main()
 {
-  size_t size = 6;
+  size_t size = 8;
   int err = 0;
   top::IDraw * f[size] = {};
   top::p_t * p = nullptr;
@@ -227,10 +239,6 @@ top::p_t top::Dline::next(p_t p) const
   return {p.x + 1, p.y + 1};
 }
 
-top::Square::Square(p_t p, int l):
-  Square(p.x, p.y, l)
-{}
-
 top::Rectangle::Rectangle(int x, int y, int a, int b):
   IDraw(),
   start{x, y},
@@ -268,14 +276,63 @@ top::p_t top::Rectangle::next(p_t p) const
   return start;
 }
 
+top::RectangleFilled::RectangleFilled(int x, int y, int a, int b):
+  IDraw(),
+  start{x, y},
+  a_(a),
+  b_(b)
+{
+  if (a_ <= 0 || b_ <= 0) {
+    throw std::invalid_argument("lenght can not be <= 0");
+  }
+}
+
+top::RectangleFilled::RectangleFilled(p_t p, int a, int b):
+  RectangleFilled(p.x, p.y, a, b)
+{}
+
+top::p_t top::RectangleFilled::begin() const
+{
+  return start;
+}
+
+top::p_t top::RectangleFilled::next(p_t p) const
+{
+  if (p.x < start.x + b_ - 1) {
+    return {p.x + 1, p.y};
+  } else if (p.y < start.y + a_ - 1) {
+    return {start.x, p.y + 1};
+  }
+  return start;
+}
+
+top::Square::Square(int x, int y, int l):
+  Rectangle(x, y, l, l)
+{}
+
+top::Square::Square(p_t p, int l):
+  Square(p.x, p.y, l)
+{}
+
+top::SquareFilled::SquareFilled(int x, int y, int l):
+  RectangleFilled(x, y, l, l)
+{}
+
+top::SquareFilled::SquareFilled(p_t p, int l):
+  SquareFilled(p.x, p.y, l)
+{}
+
 void top::make_f(IDraw ** b, size_t k)
 {
   b[0] = new Dot(0, 0);
   b[1] = new Hline({-1, -5}, 5);
-  b[2] = new Square(15, 7, 5);
+  b[2] = new SquareFilled(15, 7, 5);
   b[3] = new Dline(0, 3, 4);
   b[4] = new Vline(11, 8, 7);
-  b[5] = new Rectangle(20, 16, 3, 7);
+  b[5] = new RectangleFilled(20, 16, 3, 7);
+  b[6] = new Square(25, 30, 7);
+  b[7] = new Rectangle(80,0, 15, 17);
+
 
 }
 
