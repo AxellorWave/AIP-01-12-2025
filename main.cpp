@@ -8,6 +8,7 @@ namespace top {
   struct IDraw {
     virtual p_t begin() const = 0;
     virtual p_t next(p_t) const = 0;
+    virtual ~IDraw() = default;
   };
 
   struct Dot: IDraw {
@@ -50,11 +51,12 @@ namespace top {
   };
 
   void make_f(IDraw ** b, size_t k);
-  void get_points(IDraw * b, p_t ** ps, size_t & s);
+  size_t get_points(IDraw * b, p_t ** ps, size_t & s);
   frame_t build_frame(const p_t * ps, size_t s);
   char * build_canvas(frame_t f);
   void paint_canvas(char * cnv, frame_t fr, const p_t * ps, size_t k, char f);
   void print_canvas(const char * cnv, frame_t fr);
+  void extend(p_t ** pts, size_t s, p_t p);
   bool operator==(p_t a, p_t b)
   {
     return a.x == b.x && a.y == b.y;
@@ -93,19 +95,7 @@ int main()
   return err;
 }
 
-top::Dot::Dot(int x, int y):
-  IDraw(), 
-  o{x,y}
-{}
-top::p_t top::Dot::begin() const
-{
-  return o;
-}
 
-top::p_t top::Dot::next(p_t p) const
-{
-  return begin();
-}
 
 top::Dot::Dot(int x, int y):
   IDraw(),
@@ -234,9 +224,29 @@ void top::make_f(IDraw ** b, size_t k)
   b[2] = new Dot(7, 7);
 }
 
-void top::get_points(IDraw * b, p_t ** ps, size_t & s)
+void top::extend(p_t ** pts, size_t s, p_t p)
 {
-  p_t a = b->begin();
+  p_t * res = new p_t[s + 1];
+  for (size_t i = 0; i < s; ++i) {
+    res[i] = (*pts)[i];
+  }
+  res[s] = p;
+  delete[] *pts;
+  *pts = res;
+}
+
+size_t top::get_points(IDraw * b, p_t ** ps, size_t & s)
+{
+  p_t p = b->begin();
+  extend(ps, s, p);
+  size_t delta = 1;
+  while (b->next(p) != b->begin()) {
+    p = b->next(p);
+    extend(ps, s + delta, p);
+    ++delta;
+    //добавить p в массив
+  }
+  return delta;
   // Достать точки
   // Сгенерировать точки
   // Положить в ps (обновить массив)
@@ -245,6 +255,7 @@ void top::get_points(IDraw * b, p_t ** ps, size_t & s)
 
 top::frame_t top::build_frame(const p_t * ps, size_t s)
 {
+  
   // Найти min и max для x и y
   // Сформировать frame_t
 }
