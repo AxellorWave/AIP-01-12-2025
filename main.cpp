@@ -7,26 +7,27 @@ namespace top {
 
   struct IDraw {
     virtual p_t begin() const = 0;
-    virtual p_t next() const = 0;
+    virtual p_t next(p_t) const = 0;
   };
 
   struct Dot: IDraw {
     p_t o;
     Dot(int x, int y);
+    Dot(p_t p);
     p_t begin() const override;
-    p_t next() const override;
+    p_t next(p_t p) const override;
   };
 
-  struct Frame_t {
+  struct frame_t {
     p_t leftBot, rightTop;
   };
 
-  void makeF(IDraw ** b, size_t k) {}
-  void getPoints(IDraw * b, p_t ** ps, size_t & s) {}
-  Frame_t build_frame(const p_t * ps, size_t s) {}
-  char * build_canvas(Frame_t f) {}
-  void paintCanvas(char * cnv, Frame_t fr, const p_t * ps, size_t k, char f) {}
-  void printCanvas(const char * cnv, Frame_t fr) {}
+  void make_f(IDraw ** b, size_t k);
+  void get_points(IDraw * b, p_t ** ps, size_t & s);
+  frame_t build_frame(const p_t * ps, size_t s);
+  char * build_canvas(frame_t f);
+  void paint_canvas(char * cnv, frame_t fr, const p_t * ps, size_t k, char f);
+  void print_canvas(const char * cnv, frame_t fr);
   bool operator==(p_t a, p_t b)
   {
     return a.x == b.x && a.y == b.y;
@@ -38,19 +39,6 @@ namespace top {
   }
 }
 
-top::Dot::Dot(int x, int y):
-  IDraw(), o{x,y}
-{}
-top::p_t top::Dot::begin() const
-{
-  return o;
-}
-
-top::p_t top::Dot::next() const
-{
-  return begin();
-}
-
 int main()
 {
   int err = 0;
@@ -59,14 +47,14 @@ int main()
   char * cnv = nullptr;
   size_t s = 0; 
   try {
-    makeF(f,3);
+    make_f(f,3);
     for (size_t i = 0; i < 3; ++i) {
-      getPoints(f[i], &p, s);
+      get_points(f[i], &p, s);
     }
-    top::Frame_t fr = top::build_frame(p, s);
+    top::frame_t fr = top::build_frame(p, s);
     cnv = top::build_canvas(fr);
-    top::paintCanvas(cnv, fr, p, s, '&');
-    top::printCanvas(cnv, fr);
+    top::paint_canvas(cnv, fr, p, s, '&');
+    top::print_canvas(cnv, fr);
   } catch (...) {
     err = 1;
   }
@@ -76,4 +64,72 @@ int main()
   delete[] p;
   delete[] cnv;
   return err;
+}
+
+top::Dot::Dot(int x, int y):
+  IDraw(), o{x,y}
+{}
+top::p_t top::Dot::begin() const
+{
+  return o;
+}
+
+top::p_t top::Dot::next(p_t p) const
+{
+  return begin();
+}
+
+top::Dot::Dot(int x, int y):
+  IDraw(), o{x, y}
+{}
+
+top::Dot::Dot(top::p_t p):
+  IDraw(), o{p.x, p.y}
+{}
+
+top::p_t top::Dot::begin() const
+{
+  return o;
+}
+
+top::p_t top::Dot::next(top::p_t p) const
+{
+  return begin();
+}
+
+void top::make_f(top::IDraw ** b, size_t k)
+{
+  b[0] = new Dot(0, 0);
+  b[1] = new Dot(-1, -5);
+  b[2] = new Dot(7, 7);
+}
+
+void top::get_points(top::IDraw * b, p_t ** ps, size_t & s)
+{
+  p_t a = b->begin();
+  // Достать точки
+  // Сгенерировать точки
+  // Положить в ps (обновить массив)
+  // Обновить размер
+}
+
+top::frame_t top::build_frame(const top::p_t * ps, size_t s)
+{
+  // Найти min и max для x и y
+  // Сформировать frame_t
+}
+
+char * top::build_canvas(top::frame_t f)
+{
+  // Посчитать кол-во колонок и строк (max - min + 1)
+}
+
+void top::paint_canvas(char * cnv, top::frame_t fr, const top::p_t * ps, size_t k, char f)
+{
+  // Перевести в другие координаты
+}
+
+void top::print_canvas(const char * cnv, top::frame_t fr)
+{
+  // std::cout
 }
