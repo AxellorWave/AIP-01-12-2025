@@ -58,9 +58,9 @@ int main()
   } catch (...) {
     err = 1;
   }
-  delete[] f[0];
-  delete[] f[1];
-  delete[] f[2];
+  delete f[0];
+  delete f[1];
+  delete f[2];
   delete[] p;
   delete[] cnv;
   return err;
@@ -83,7 +83,7 @@ top::Dot::Dot(int x, int y):
   IDraw(), o{x, y}
 {}
 
-top::Dot::Dot(top::p_t p):
+top::Dot::Dot(p_t p):
   IDraw(), o{p.x, p.y}
 {}
 
@@ -92,19 +92,19 @@ top::p_t top::Dot::begin() const
   return o;
 }
 
-top::p_t top::Dot::next(top::p_t p) const
+top::p_t top::Dot::next(p_t p) const
 {
   return begin();
 }
 
-void top::make_f(top::IDraw ** b, size_t k)
+void top::make_f(IDraw ** b, size_t k)
 {
   b[0] = new Dot(0, 0);
   b[1] = new Dot(-1, -5);
   b[2] = new Dot(7, 7);
 }
 
-void top::get_points(top::IDraw * b, p_t ** ps, size_t & s)
+void top::get_points(IDraw * b, p_t ** ps, size_t & s)
 {
   p_t a = b->begin();
   // Достать точки
@@ -113,23 +113,23 @@ void top::get_points(top::IDraw * b, p_t ** ps, size_t & s)
   // Обновить размер
 }
 
-top::frame_t top::build_frame(const top::p_t * ps, size_t s)
+top::frame_t top::build_frame(const p_t * ps, size_t s)
 {
   // Найти min и max для x и y
   // Сформировать frame_t
 }
 
-char * top::build_canvas(top::frame_t f)
+char * top::build_canvas(frame_t f)
 {
   // Посчитать кол-во колонок и строк (max - min + 1)
 }
 
-void top::paint_canvas(char * cnv, top::frame_t fr, const top::p_t * ps, size_t k, char f)
+void top::paint_canvas(char * cnv, frame_t fr, const p_t * ps, size_t k, char f)
 {
   // Перевести в другие координаты
 }
 
-void top::print_canvas(const char * cnv, top::frame_t fr)
+void top::print_canvas(const char * cnv, frame_t fr)
 {
   // std::cout
 }
