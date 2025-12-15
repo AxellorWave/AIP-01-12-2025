@@ -1,13 +1,8 @@
 #include <iostream>
 #include "geom.hpp"
+#include "idraw.hpp"
 
 namespace top {
-  struct IDraw {
-    virtual p_t begin() const = 0;
-    virtual p_t next(p_t) const = 0;
-    virtual ~IDraw() = default;
-  };
-
   struct Dot: IDraw {
     Dot(int x, int y);
     Dot(p_t p);
@@ -80,12 +75,10 @@ namespace top {
   };
 
   void make_f(IDraw ** b, size_t k);
-  size_t get_points(IDraw * b, p_t ** ps, size_t & s);
   frame_t build_frame(const p_t * ps, size_t s);
   char * build_canvas(frame_t f, char fill);
   void paint_canvas(char * cnv, frame_t fr, const p_t * ps, size_t k, char f);
   void print_canvas(std::ostream & os, const char * cnv, frame_t fr);
-  void extend(p_t ** pts, size_t s, p_t p);
 }
 
 int main()
@@ -115,8 +108,6 @@ int main()
   delete[] cnv;
   return err;
 }
-
-
 
 top::Dot::Dot(int x, int y):
   IDraw(),
@@ -375,30 +366,6 @@ void top::make_f(IDraw ** b, size_t k)
   b[7] = new Rectangle(80,0, 15, 17);
 
 
-}
-
-void top::extend(p_t ** pts, size_t s, p_t p)
-{
-  p_t * res = new p_t[s + 1];
-  for (size_t i = 0; i < s; ++i) {
-    res[i] = (*pts)[i];
-  }
-  res[s] = p;
-  delete[] *pts;
-  *pts = res;
-}
-
-size_t top::get_points(IDraw * b, p_t ** ps, size_t & s)
-{
-  p_t p = b->begin();
-  extend(ps, s, p);
-  size_t delta = 1;
-  while (b->next(p) != b->begin()) {
-    p = b->next(p);
-    extend(ps, s + delta, p);
-    ++delta;
-  }
-  return s+=delta;
 }
 
 top::frame_t top::build_frame(const p_t * ps, size_t s)
