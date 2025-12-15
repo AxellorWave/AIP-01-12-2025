@@ -1,16 +1,9 @@
 #include <iostream>
 #include "geom.hpp"
 #include "idraw.hpp"
+#include "dot.hpp"
 
 namespace top {
-  struct Dot: IDraw {
-    Dot(int x, int y);
-    Dot(p_t p);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t o;
-  };
-
   struct Vline: IDraw {
     Vline(int x, int y, int l);
     Vline(p_t p, int l);
@@ -107,26 +100,6 @@ int main()
   delete[] p;
   delete[] cnv;
   return err;
-}
-
-top::Dot::Dot(int x, int y):
-  IDraw(),
-  o{x, y}
-{}
-
-top::Dot::Dot(p_t p):
-  IDraw(), 
-  o(p)
-{}
-
-top::p_t top::Dot::begin() const
-{
-  return o;
-}
-
-top::p_t top::Dot::next(p_t p) const
-{
-  return begin();
 }
 
 top::Vline::Vline(int x, int y, int l):
