@@ -1,10 +1,7 @@
 #include <iostream>
+#include "geom.hpp"
 
 namespace top {
-  struct p_t {
-    int x, y;
-  };
-
   struct IDraw {
     virtual p_t begin() const = 0;
     virtual p_t next(p_t) const = 0;
@@ -82,10 +79,6 @@ namespace top {
     int len;
   };
 
-  struct frame_t {
-    p_t leftBot, rightTop;
-  };
-
   void make_f(IDraw ** b, size_t k);
   size_t get_points(IDraw * b, p_t ** ps, size_t & s);
   frame_t build_frame(const p_t * ps, size_t s);
@@ -93,15 +86,6 @@ namespace top {
   void paint_canvas(char * cnv, frame_t fr, const p_t * ps, size_t k, char f);
   void print_canvas(std::ostream & os, const char * cnv, frame_t fr);
   void extend(p_t ** pts, size_t s, p_t p);
-  bool operator==(p_t a, p_t b)
-  {
-    return a.x == b.x && a.y == b.y;
-  }
-  
-  bool operator!=(p_t a, p_t b)
-  {
-    return !(a == b);
-  }
 }
 
 int main()
@@ -118,8 +102,8 @@ int main()
       get_points(f[i], &p, s);
     }
     top::frame_t fr = top::build_frame(p, s);
-    cnv = top::build_canvas(fr, '.');
-    top::paint_canvas(cnv, fr, p, s, '&');
+    cnv = top::build_canvas(fr, ' ');
+    top::paint_canvas(cnv, fr, p, s, '$');
     top::print_canvas(std::cout, cnv, fr);
   } catch (...) {
     err = 1;
@@ -433,16 +417,6 @@ top::frame_t top::build_frame(const p_t * ps, size_t s)
   p_t aa {minx, miny};
   p_t bb { maxx, maxy};
   return {aa, bb};
-}
-
-size_t rows(top::frame_t fr) 
-{
-  return (fr.rightTop.y - fr.leftBot.y + 1);
-}
-
-size_t cols(top::frame_t fr) 
-{
-  return (fr.rightTop.x - fr.leftBot.x + 1);
 }
 
 char * top::build_canvas(frame_t f, char fill)
