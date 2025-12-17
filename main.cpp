@@ -2,69 +2,6 @@
 #include "tdraw.hpp"
 
 namespace top {
-  struct Vline: IDraw {
-    Vline(int x, int y, int l);
-    Vline(p_t p, int l);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t start;
-    int len;
-  };
-
-  struct Hline: IDraw {
-    Hline(int x, int y, int l);
-    Hline(p_t p, int l);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t start;
-    int len;
-  };
-
-  struct Dline: IDraw {
-    Dline(int x, int y, int l);
-    Dline(p_t p, int l);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t start;
-    int len;
-  };
-
-  struct Rectangle: IDraw {
-    Rectangle(int x, int y, int a, int b);
-    Rectangle(p_t p, int a, int b);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t start;
-    int a_, b_;
-  };
-
-  struct RectangleFilled: IDraw {
-    RectangleFilled(int x, int y, int a, int b);
-    RectangleFilled(p_t p, int a, int b);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t start;
-    int a_, b_;
-  };
-
-  struct Square: IDraw {
-    Square(int x, int y, int l);
-    Square(p_t p, int l);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t start;
-    int len;
-  };
-
-  struct SquareFilled: IDraw {
-    SquareFilled(int x, int y, int l);
-    SquareFilled(p_t p, int l);
-    p_t begin() const override;
-    p_t next(p_t p) const override;
-    p_t start;
-    int len;
-  };
-
   void make_f(IDraw ** b, size_t k);
 }
 
