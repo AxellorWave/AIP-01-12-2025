@@ -1,4 +1,4 @@
-#include "rectangle.hpp"
+#include "rectanglefilled.hpp"
 
 top::RectangleFilled::RectangleFilled(int x, int y, int a, int b):
   IDraw(),
