@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 void hi()
 {
@@ -12,10 +13,15 @@ bool is_space(char c)
 
 std::istream& getword(std::istream& is, char * word, size_t k, bool(*c)(char))
 {
+  assert(k > 0 && "k must be greater than 0");
+  if (!k || !word) {
+    throw std::logic_error("bad buffer size");
+  }
   is >> std::noskipws;
   size_t i = 0;
-  for (char next = 0; (is) && !c(next) && i < k; ++i, word[i] = next) {
+  for (char next = 0; is && !c(next) && (i < k - 1); ++i) {
     is >> next;
+    word[i] = next;
   }
   if (i == k) {
     is.clear(is.rdstate() | std::ios::failbit);
