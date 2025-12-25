@@ -1,3 +1,8 @@
+CPPFLAGS += -Wall -Wextra -std=c++11
 SRC = $(wildcard *.cpp)
-paint: $(SRC)
+OBJ = $(SRC:%.cpp=%.o)
+paint: $(OBJ)
 	$(CXX) $^ -o $@
+
+clean:
+	$(RM) -rf $(OBJ)

@@ -2,7 +2,7 @@
 #include "tdraw.hpp"
 
 namespace top {
-  void make_f(IDraw ** b, size_t k);
+  void make_f(IDraw ** b);
 }
 
 int main()
@@ -14,7 +14,7 @@ int main()
   char * cnv = nullptr;
   size_t s = 0; 
   try {
-    make_f(f,size);
+    make_f(f);
     for (size_t i = 0; i < size; ++i) {
       get_points(f[i], &p, s);
     }
@@ -33,7 +33,7 @@ int main()
   return err;
 }
 
-void top::make_f(IDraw ** b, size_t k)
+void top::make_f(IDraw ** b)
 {
   b[0] = new Dot(0, 0);
   b[1] = new Hline({-1, -5}, 5);
