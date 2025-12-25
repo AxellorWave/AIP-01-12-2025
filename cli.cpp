@@ -1,9 +1,15 @@
 #include <iostream>
 #include <cassert>
+#include <cstring>
 
 void hi()
 {
   std::cout << "< Hi! >\n";
+}
+
+void hello()
+{
+  std::cout << "< HELLO! >\n";
 }
 
 bool is_space(char c)
@@ -11,10 +17,10 @@ bool is_space(char c)
   return std::isspace(c);
 }
 
-std::istream& getword(std::istream& is, char * word, size_t k, bool(*c)(char))
+std::istream& getword(std::istream& is, char * word, size_t k, size_t & size, bool(*c)(char))
 {
   assert(k > 0 && "k must be greater than 0");
-  if (!k || !word) {
+  if (k <= 0 || !word) {
     throw std::logic_error("bad buffer size");
   }
   is >> std::noskipws;
@@ -23,30 +29,46 @@ std::istream& getword(std::istream& is, char * word, size_t k, bool(*c)(char))
     is >> next;
     word[i] = next;
   }
+
   if (i == k) {
     is.clear(is.rdstate() | std::ios::failbit);
   }
+  size = i;
+  word[i] = 0;
   return is >> std::skipws;
 }
 
-size_t match(const char * word , const char * const * words, size_t k);
+size_t match(const char * word , const char * const * words, size_t k)
+{
+  for (size_t i = 0; i < k; ++i) {
+    bool matching = std::strlen(word) == std::strlen(words[i]);
+    matching = matching && !std::strcmp(word, words[i]);
+    if (matching) {
+      return i;
+    }
+  }
+  return k;
+}
 
 int main()
 {
-  constexpr size_t cmds_counts = 1;
-  void(*cmds[1])() = {hi};
-  const char * const cmds_text[] = {"hi"};
+  constexpr size_t cmds_counts = 2;
+  void(*cmds[cmds_counts])() = {hi, hello};
+  const char * const cmds_text[] = {"hi", "hello"};
   constexpr size_t bsize = 255;
   char word[bsize + 1] = {};
-  while (!getword(std::cin, word, bsize, is_space)) {
+  size_t size = 0;
+  while (getword(std::cin, word, bsize, size, is_space)) {
     if (std::cin.fail()) {
       std::cerr << "< INVALID INPUT >\n";
       return 1;
-    } else if (size_t i = match(word, cmds_text, cmds_counts); i < cmds_counts) {
-      cmds[i]();
     } else {
+      word[size - 1] = 0;
+      if (size_t i = match(word, cmds_text, cmds_counts); i < cmds_counts) {
+        cmds[i]();
+      } else {
       std::cerr << "< INVALID COMMAND >\n";
+      } 
     }
   }
-  
 }
